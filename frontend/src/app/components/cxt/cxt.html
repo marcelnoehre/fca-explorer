@@ -1,0 +1,85 @@
+<div class="cxt-wrapper">
+    <div class="table-section">
+        <div class="table-scroll">
+            <table class="ctx-table">
+                <thead>
+                    <tr>
+                        <th class="corner-cell"></th>
+                        @for (col of columns; track col; let c = $index) {
+                        <th class="col-header">
+                            @if (editingCol === c) {
+                            <input class="header-input" [(ngModel)]="editingValue" (blur)="stopEdit()"
+                                (keydown.enter)="stopEdit()" autofocus />
+                            } @else {
+                            <span class="header-label" (dblclick)="startEditCol(c)">{{ col }}</span>
+                            }
+                            <button class="remove-btn" (click)="removeColumn(c)" title="Remove column">x</button>
+                        </th>
+                        }
+                        <th class="add-col-cell">
+                            <button class="add-btn" (click)="addColumn()">+ Col</button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (row of rows; track row; let r = $index) {
+                    <tr>
+                        <td class="row-header">
+                            @if (editingRow === r) {
+                            <input class="header-input" [(ngModel)]="editingValue" (blur)="stopEdit()"
+                                (keydown.enter)="stopEdit()" autofocus />
+                            } @else {
+                            <span class="header-label" (dblclick)="startEditRow(r)">{{ row }}</span>
+                            }
+                            <button class="remove-btn" (click)="removeRow(r)" title="Remove row">x</button>
+                        </td>
+                        @for (col of columns; track col; let c = $index) {
+                        <td class="cell" [class.active]="cells[r][c]" (click)="toggleCell(r, c)">
+                            @if (cells[r][c]) {
+                            <span class="cross">x</span>
+                            }
+                        </td>
+                        }
+                        <td class="filler"></td>
+                    </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td class="add-row-cell" colspan="1">
+                            <button class="add-btn" (click)="addRow()">+ Row</button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="upload-container">
+        <div class="drop-zone" [class.dragging]="isDragging" (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="fileInput.click()">
+            <div class="drop-zone__icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+            </div>
+            <p class="drop-zone__title">Drop your .cxt file here</p>
+            <p class="drop-zone__subtitle">or click to browse</p>
+            @if (fileName && !parseError) {
+            <div class="drop-zone__file-name success">
+                <span>{{ isDirty ? '&#9888; Modified — ' + fileName : '&#x2713; ' + fileName }}</span>
+            </div>
+            }
+            @if (parseError) {
+            <div class="drop-zone__file-name error">
+                <span>&#9888; {{ parseError }}</span>
+            </div>
+            }
+            <input #fileInput type="file" accept=".cxt" style="display: none" (change)="onFileSelected($event)" />
+        </div>
+    </div>
+
+</div>
